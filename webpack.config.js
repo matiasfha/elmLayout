@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const autoprefixer      = require('autoprefixer');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const Webpack = require('webpack')
 module.exports = {
   entry: [
     'webpack-dev-server/client?http://localhost:8080',
@@ -22,7 +23,12 @@ module.exports = {
 
   plugins: [
     new CleanWebpackPlugin(['dist']  ),
-    new HtmlWebpackPlugin()
+    new HtmlWebpackPlugin(),
+    // new Webpack.optimize.CommonsChunkPlugin({
+    //     name: "init",
+    //     minChunks: Infinity
+    // }),
+    new Webpack.optimize.OccurenceOrderPlugin()
   ],
   postcss: [ autoprefixer({ browsers: ['last 2 versions'] }) ],
 
@@ -39,10 +45,11 @@ module.exports = {
         loader: 'elm-hot!elm-webpack?verbose=true&warn=true'
       },
       {
-        test: /src\/Stylesheets.elm$/,
+        test: /Stylesheets.elm$/,
         loader: 'style!css?sourceMap!postcss!elm-css-webpack'
       }
-    ]
+    ],
+    noParse: /^(?!.*Stylesheets).*\.elm$/
   },
 
   target: 'web',
@@ -50,6 +57,7 @@ module.exports = {
   devServer: {
     inline: true,
     stats: 'errors-only',
-    hot: true
+    hot: true,
+    progress: true
   }
 };

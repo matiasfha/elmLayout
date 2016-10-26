@@ -1,6 +1,6 @@
 port module Stylesheets exposing (..)
 
-import Grid exposing (..)
+import Layout.Grid exposing (..)
 
 
 -- To create a css file

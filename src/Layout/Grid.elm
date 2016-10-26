@@ -1,4 +1,4 @@
-module Grid exposing (css, CssClasses(..), styleNamespace)
+module Layout.Grid exposing (css, CssClasses(..), styleNamespace)
 
 import Css exposing (..)
 import Css.Namespace exposing (namespace)
@@ -14,6 +14,7 @@ styleNamespace =
 type CssClasses
     = Layout
     | Wrap
+    | NoWrap
     | Fill
     | Flex
     | FlexInitial
@@ -43,7 +44,7 @@ size name =
             [ (.) LayoutRow
                 [ children
                     [ (.) (concat [ (toString Flex), "-", name ])
-                        [ maxWidth (px size)
+                        [ maxWidth (pct size)
                         , maxHeight (pct 100)
                         ]
                     ]
@@ -51,14 +52,14 @@ size name =
             , (.) LayoutColumn
                 [ children
                     [ (.) (concat [ (toString Flex), "-", name ])
-                        [ maxHeight (px size)
+                        [ maxHeight (pct size)
                         , maxWidth (pct 100)
                         ]
                     ]
                 ]
             , (.) (concat [ (toString Flex), "-", name ])
                 [ boxSizing borderBox
-                , flex3 (int 1) (int 1) (px size)
+                , flex3 (int 1) (int 1) (pct size)
                 ]
             ]
 
@@ -128,6 +129,8 @@ baseCss =
     , (.) Wrap
         [ flexWrap wrap
         ]
+    , (.) NoWrap
+        [ flexWrap noWrap ]
     , (.) Fill
         [ position relative
         , width (pct 100)

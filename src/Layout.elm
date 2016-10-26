@@ -1,18 +1,19 @@
-module Layout exposing (layout, LayoutParams)
-
-import Html exposing (..)
-import Grid exposing (..)
-import String exposing (concat)
-import Array exposing (fromList, get)
-
-
-{ id, class, classList, name } =
-    styleNamespace
-
-
+module Layout
+    exposing
+        ( layout
+        , flex
+        , container
+        , alignPerpen
+        , alignPara
+        , size
+        , direction
+        , fill
+        , wrap
+        , order
+        )
 
 {-
-   * The <Layout /> element works as the container of many child flexboxes.
+   * The <layout /> element works as the container of many child flexboxes.
    * Its direction determines whether the children display forming rows or columns
    * across its length.
    * The align parameter is a string that determines where are the children placed
@@ -90,159 +91,129 @@ import Array exposing (fromList, get)
    * ```
 -}
 
-
-type Alignment
-    = Start
-    | Center
-    | End'
-    | SpaceAround
-    | SpaceBetween
-    | Stretch
+import Html exposing (..)
+import Layout.Grid exposing (styleNamespace)
+import Layout.Helpers exposing (..)
+import Layout.Attributes as Attr exposing (..)
 
 
-toAlignment : String -> Alignment
-toAlignment string =
-    case string of
-        "start" ->
-            Start
-
-        "center" ->
-            Center
-
-        "end" ->
-            End'
-
-        "space-around" ->
-            SpaceAround
-
-        "space-between" ->
-            SpaceBetween
-
-        "stretch" ->
-            Stretch
-
-        _ ->
-            Start
-
-
-getAlignment : String -> Alignment -> String
-getAlignment type' value =
-    case value of
-        Start ->
-            case type' of
-                "perpendicular" ->
-                    toString AlignPerpendicularStart
-
-                "parallel" ->
-                    toString AlignParallelStart
-
-                _ ->
-                    ""
-
-        Center ->
-            case type' of
-                "perpendicular" ->
-                    toString AlignPerpendicularCenter
-
-                "parallel" ->
-                    toString AlignParallelCenter
-
-                _ ->
-                    ""
-
-        End' ->
-            case type' of
-                "perpendicular" ->
-                    toString AlignPerpendicularEnd
-
-                "parallel" ->
-                    toString AlignParallelEnd
-
-                _ ->
-                    ""
-
-        SpaceAround ->
-            toString AlignParallelSpaceAround
-
-        SpaceBetween ->
-            toString AlignParallelSpaceBetween
-
-        Stretch ->
-            toString AlignPerpendicularStretch
-
-
-parseDirection : String -> Bool -> String
-parseDirection direction reverse =
-    if direction == "row" then
-        if reverse == True then
-            toString LayoutRowReverse
-        else
-            toString LayoutRow
-    else if reverse == True then
-        toString LayoutColumnReverse
-    else
-        toString LayoutColumn
-
-
-parseSize : String -> String
-parseSize size =
-    String.concat [ "Flex-", size ]
-
-
-parseOrder : String -> String
-parseOrder order =
-    String.concat [ "FlexOrder-", order ]
-
-
-type alias LayoutParams =
-    { align : Maybe String
-    , direction : Maybe String
-    , reverse : Maybe Bool
-    , size : Maybe String
-    , order : Maybe String
-    , wrap : Maybe Bool
-    , fill : Maybe Bool
-    }
-
-
-layout : LayoutParams -> Html b -> Html b
+{ id, class, classList, name } =
+    styleNamespace
+layout : List LAttr -> List (Html msg) -> Html msg
 layout params children =
+    node "layout" (getClassList params) children
+
+
+
+{-
+   * The <Flex /> element serves as both a column and a row, depending on its
+   * <Layout /> direction.
+   * Both the size and order parameters can take the form of a number or an object
+   * if a media query needs to be specified.
+   * The supported queries are:
+   * - mobile
+   * - small
+   * - medium
+   * - large
+   * - the `>` operator, which means greater than (`> small`)
+   *
+   * Examples
+   *
+   * ```
+   * // first on mobile, second on small and third on greater than small resolutions
+   * <Flex order={{
+   *   'mobile': 0,
+   *   'small': 1,
+   *   '> small': 2
+   * }} />
+   * // first on greater than small, second on mobile and third on small resolutions
+   * <Flex order={{
+   *   'mobile': 1,
+   *   'small': 2,
+   *   '> small': 0
+   * }} />
+   * // first on small, second on greater than small and third on mobile resolutions
+   * <Flex order={{
+   *   'mobile': 2,
+   *   'small': 0,
+   *   '> small': 1
+   * }} />
+   * ```
+   *
+   * ```
+   * <Flex size={{
+   *   'mobile': 50,
+   *   'small': 30,
+   *   '> small': 20
+   * }} />
+   * <Flex size="100">
+   * ```
+-}
+
+
+flex : List LAttr -> List (Html msg) -> Html msg
+flex params children =
+    node "flex"
+        (getClassList params)
+        children
+
+
+
+{-
+   * Utility for centering Layouts inside other Layouts, has the same parameters
+   * as the `layout` element, but it always fills the parent component.
+   * (from http://stackoverflow.com/questions/15381172/css-flexbox-child-height-100)
+-}
+
+
+container : List LAttr -> List (Html msg) -> Html msg
+container params children =
     let
-        size =
-            parseSize (Maybe.withDefault "100" params.size)
+        innerParams =
+            [ fill True ]
 
-        -- Get alignment
-        aligns =
-            Array.fromList (String.split " " (Maybe.withDefault "start stretch" params.align))
-
-        parallel =
-            toAlignment (String.toLower (Maybe.withDefault "start" (Array.get 0 aligns)))
-
-        perpendicular =
-            toAlignment (String.toLower (Maybe.withDefault "stretch" (Array.get 1 aligns)))
-
-        direction =
-            parseDirection (Maybe.withDefault "row" params.direction) (Maybe.withDefault False params.reverse)
-
-        order =
-            parseOrder (Maybe.withDefault "1" params.order)
-
-        wrap =
-            Maybe.withDefault True params.wrap
-
-        fill =
-            Maybe.withDefault False params.fill
-
-        classes =
-            [ ( size, True )
-            , ( direction, True )
-            , ( getAlignment "parallel" parallel, True )
-            , ( getAlignment "perpendicular" perpendicular, True )
-            , ( order, True )
-            , ( toString Wrap, wrap )
-            , ( toString Fill, fill )
-            ]
+        -- params :: [ fill True ]
     in
-        div [ classList classes ]
-            [ children
+        layout
+            [ wrap False, fill True ]
+            [ (layout innerParams (children))
             ]
+
+
+
+{- Attributes -}
+
+
+alignPerpen : String -> LAttr
+alignPerpen str =
+    Attr.alignPerpen str
+
+
+alignPara : String -> LAttr
+alignPara str =
+    Attr.alignPara str
+
+
+size : String -> LAttr
+size str =
+    Attr.size str
+
+
+direction : ( String, Bool ) -> LAttr
+direction ( str, reverse ) =
+    Attr.direction ( str, reverse )
+
+
+fill : Bool -> LAttr
+fill bool =
+    Attr.fill bool
+
+
+wrap : Bool -> LAttr
+wrap bool =
+    Attr.wrap bool
+
+
+order : Int -> LAttr
+order number =
+    Attr.order number
