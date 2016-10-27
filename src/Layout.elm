@@ -12,85 +12,6 @@ module Layout
         , order
         )
 
-{-
-   * The <layout /> element works as the container of many child flexboxes.
-   * Its direction determines whether the children display forming rows or columns
-   * across its length.
-   * The align parameter is a string that determines where are the children placed
-   * and aligned. Its composed in two parts; parallel and perpendicular.
-   * Parallel:
-   * - start (default)
-   * - center
-   * - end
-   * - space around
-   * - space between
-   * Perpendicular:
-   * - start
-   * - center
-   * - end
-   * - stretch (default)
-   * Note: the <Layout /> component can also act as a <Flex /> component when the
-   * size parameter is passed
-   *
-   * Examples
-   *
-   * ```html
-   * <Layout>
-   *   <Flex /><Flex /><Flex />
-   * </Layout>
-   * ```
-   *
-   * Defaults to a row layout with 'start stretch' alignment
-   *
-   * ```
-   * |[   ][   ][   ]|
-   * |[ 1 ][ 2 ][ 3 ]|
-   * |[   ][   ][   ]|
-   * ```
-   *
-   * ---
-   *
-   * ```html
-   * <Layout direction="column">
-   *   <Flex /><Flex /><Flex />
-   * </Layout>
-   * ```
-   *
-   * ```
-   * |[   1   ]|
-   * |[   2   ]|
-   * |[   3   ]|
-   * ```
-   *
-   * ---
-   *
-   * ```html
-   * <Layout align="center center">
-   *   <Flex /><Flex /><Flex />
-   * </Layout>
-   * ```
-   *
-   * ```
-   * |               |
-   * |   [1][2][3]   |
-   * |               |
-   * ```
-   *
-   * ---
-   *
-   * ```html
-   * <Layout align="space-between center">
-   *   <Flex /><Flex /><Flex />
-   * </Layout>
-   * ```
-   *
-   * ```
-   * |               |
-   * | [1]  [2]  [3] |
-   * |               |
-   * ```
--}
-
 import Html exposing (..)
 import Layout.Grid exposing (styleNamespace)
 import Layout.Helpers exposing (..)
@@ -101,54 +22,20 @@ import Layout.Attributes as Attr exposing (..)
     styleNamespace
 layout : List LAttr -> List (Html msg) -> Html msg
 layout params children =
-    node "layout" (getClassList params) children
+    case List.isEmpty (Debug.log "params" params) of
+        True ->
+            node "layout"
+                (getClassList
+                    [ direction ( "row", False )
+                    , alignPara "start"
+                    , alignPerpen "stretch"
+                    ]
+                )
+                children
 
-
-
-{-
-   * The <Flex /> element serves as both a column and a row, depending on its
-   * <Layout /> direction.
-   * Both the size and order parameters can take the form of a number or an object
-   * if a media query needs to be specified.
-   * The supported queries are:
-   * - mobile
-   * - small
-   * - medium
-   * - large
-   * - the `>` operator, which means greater than (`> small`)
-   *
-   * Examples
-   *
-   * ```
-   * // first on mobile, second on small and third on greater than small resolutions
-   * <Flex order={{
-   *   'mobile': 0,
-   *   'small': 1,
-   *   '> small': 2
-   * }} />
-   * // first on greater than small, second on mobile and third on small resolutions
-   * <Flex order={{
-   *   'mobile': 1,
-   *   'small': 2,
-   *   '> small': 0
-   * }} />
-   * // first on small, second on greater than small and third on mobile resolutions
-   * <Flex order={{
-   *   'mobile': 2,
-   *   'small': 0,
-   *   '> small': 1
-   * }} />
-   * ```
-   *
-   * ```
-   * <Flex size={{
-   *   'mobile': 50,
-   *   'small': 30,
-   *   '> small': 20
-   * }} />
-   * <Flex size="100">
-   * ```
--}
+        False ->
+            -- default parameters
+            node "layout" (getClassList params) children
 
 
 flex : List LAttr -> List (Html msg) -> Html msg
@@ -168,16 +55,9 @@ flex params children =
 
 container : List LAttr -> List (Html msg) -> Html msg
 container params children =
-    let
-        innerParams =
-            [ fill True ]
-
-        -- params :: [ fill True ]
-    in
-        layout
-            [ wrap False, fill True ]
-            [ (layout innerParams (children))
-            ]
+    layout [ fill True, wrap False ]
+        [ (layout params children)
+        ]
 
 
 

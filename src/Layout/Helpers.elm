@@ -141,16 +141,12 @@ parseDirection direction reverse =
 
 parseSize : String -> String
 parseSize size =
-    -- let
-    --     s =
-    --         Maybe.withDefault "100" size
-    -- in
-    String.concat [ "Flex-", size ]
+    toString (FlexSize size)
 
 
 parseOrder : Int -> String
 parseOrder order =
-    String.concat [ "FlexOrder-", toString order ]
+    toString (FlexOrder order)
 
 
 parseWrap : Bool -> String

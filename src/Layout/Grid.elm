@@ -32,6 +32,8 @@ type CssClasses
     | LayoutColumn
     | LayoutColumnReverse
     | Container
+    | FlexOrder Int
+    | FlexSize String
 
 
 size : String -> List Snippet
@@ -43,7 +45,7 @@ size name =
         Ok size ->
             [ (.) LayoutRow
                 [ children
-                    [ (.) (concat [ (toString Flex), "-", name ])
+                    [ (.) (FlexSize name)
                         [ maxWidth (pct size)
                         , maxHeight (pct 100)
                         ]
@@ -51,13 +53,14 @@ size name =
                 ]
             , (.) LayoutColumn
                 [ children
-                    [ (.) (concat [ (toString Flex), "-", name ])
+                    [ (.) (FlexSize name)
                         [ maxHeight (pct size)
                         , maxWidth (pct 100)
+                        , width (pct size)
                         ]
                     ]
                 ]
-            , (.) (concat [ (toString Flex), "-", name ])
+            , (.) (FlexSize name)
                 [ boxSizing borderBox
                 , flex3 (int 1) (int 1) (pct size)
                 ]
@@ -80,22 +83,23 @@ dimesion name size grow shrink =
     in
         case size of
             Auto ->
-                [ selector (concat [ styleNamespace.name, (toString Flex), "-", name ])
+                [ (.) (FlexSize name)
                     [ boxSizing borderBox
-                    , flex2 (int gr) (int shr)
+                      -- , flex3 (int gr) (int shr) auto
+                    , property "flex" "1 0 auto"
                     ]
                 ]
 
             Percent value ->
-                [ selector (concat [ styleNamespace.name, (toString Flex), "-", name ])
+                [ (.) (FlexSize name)
                     [ boxSizing borderBox
                     , flex3 (int gr) (int shr) (pct value)
                     ]
                 ]
 
 
-layout : Mixin
-layout =
+layoutMixin : Mixin
+layoutMixin =
     mixin
         [ displayFlex
         , boxSizing borderBox
@@ -111,20 +115,31 @@ flexMixin =
 
 flexOrder : Int -> List Snippet
 flexOrder value =
-    let
-        val =
-            toString value
-    in
-        [ (.) (concat [ ".FlexOrder-", val ])
-            [ order (int value)
-            ]
+    [ (.) (FlexOrder value)
+        [ order (int value)
         ]
+    ]
+
+
+justifyContent : String -> Mixin
+justifyContent str =
+    property "justify-content" str
+
+
+alignContent : String -> Mixin
+alignContent str =
+    property "align-content" str
 
 
 baseCss : List Snippet
 baseCss =
-    [ (.) Layout
-        [ layout
+    [ selector "body"
+        [ boxSizing borderBox
+        , padding zero
+        , margin zero
+        ]
+    , (.) Layout
+        [ layoutMixin
         ]
     , (.) Wrap
         [ flexWrap wrap
@@ -144,52 +159,52 @@ baseCss =
         , flex (int 1)
         ]
     , (.) AlignParallelStart
-        [ property "justify-content" "flext-start"
+        [ justifyContent "flex-start"
         ]
     , (.) AlignParallelCenter
-        [ property "justify-content" "center" ]
+        [ justifyContent "center" ]
     , (.) AlignParallelEnd
-        [ property "justify-content" "flext-end" ]
+        [ justifyContent "flex-end" ]
     , (.) AlignParallelSpaceAround
-        [ property "justify-content" "space-around" ]
+        [ justifyContent "space-around" ]
     , (.) AlignParallelSpaceBetween
-        [ property "justify-content" "space-between" ]
+        [ justifyContent "space-between" ]
     , (.) AlignPerpendicularStart
-        [ property "align-content" "flex-start"
+        [ alignContent "flex-start"
         , alignItems flexStart
         ]
     , (.) AlignPerpendicularCenter
-        [ property "align-content" "center"
+        [ alignContent "center"
         , alignItems center
         ]
     , (.) AlignPerpendicularEnd
-        [ property "align-content" "flex-end"
+        [ alignContent "flex-end"
         , alignItems flexEnd
         ]
     , (.) AlignPerpendicularStretch
-        [ property "align-content" "stretch"
+        [ alignContent "stretch"
         , alignItems stretch
         ]
     , (.) LayoutRow
-        [ layout
+        [ layoutMixin
         , flexDirection row
         ]
     , (.) LayoutRowReverse
-        [ layout
+        [ layoutMixin
         , flexDirection rowReverse
         ]
     , (.) LayoutColumn
-        [ layout
+        [ layoutMixin
         , flexDirection column
         ]
     , (.) LayoutColumnReverse
-        [ layout
+        [ layoutMixin
         , flexDirection columnReverse
         ]
     , (.) Container
         [ position relative
         , children
-            [ selector ".layout"
+            [ (.) Layout
                 [ width (pct 100)
                 , position absolute
                 ]

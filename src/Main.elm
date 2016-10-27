@@ -21,7 +21,7 @@ type alias Model =
 
 state : Model
 state =
-    Model "row" "start" "center"
+    Model "column" "start" "center"
 
 
 type Msg
@@ -44,48 +44,45 @@ checkbox attributes msg name =
     label
         [ style [ ( "padding", "20px" ) ]
         ]
-        [ input (List.concat [ attributes, [ type' "checkbox", onClick msg ] ]) []
+        [ input (List.concat [ attributes, [ type' "radio", onClick msg ] ]) []
         , text name
-        ]
-
-
-sampleLayout : Model -> Html Msg
-sampleLayout model =
-    layout
-        [ direction ( "row", False )
-        , alignPara "center"
-        , alignPerpen "center"
-        ]
-        [ flex [ Layout.size "70", order 2 ]
-            [ div
-                [ style
-                    [ ( "backgroundColor", "red" )
-                    , ( "color", "white" )
-                    ]
-                ]
-                [ text "Hello World - Order 1" ]
-            ]
-        , flex [ Layout.size "10", order 3 ]
-            [ div
-                [ style
-                    [ ( "backgroundColor", "blue" )
-                    , ( "color", "white" )
-                    ]
-                ]
-                [ text "Hello World - Order 2" ]
-            ]
-        , flex [ Layout.size "20", order 1 ]
-            [ div
-                [ style
-                    [ ( "backgroundColor", "green" )
-                    , ( "color", "white" )
-                    ]
-                ]
-                [ text "Hello World - Order 3" ]
-            ]
         ]
 
 
 view : Model -> Html Msg
 view model =
-    sampleLayout model
+    container [ Layout.size "80", direction ( model.direction, False ), alignPara "center", alignPerpen "center" ]
+        [ flex [ Layout.size "70", order 1 ]
+            [ div
+                [ style
+                    [ ( "backgroundColor", "red" )
+                    , ( "color", "white" )
+                    , ( "height", "100%" )
+                    , ( "width", "100%" )
+                    ]
+                ]
+                [ checkbox [ name "toggle", checked (model.direction == "row") ] ToggleRow "Toggle Row First in HTML - Order 1" ]
+            ]
+        , flex [ Layout.size "40", order 3 ]
+            [ div
+                [ style
+                    [ ( "backgroundColor", "blue" )
+                    , ( "color", "white" )
+                    , ( "height", "100%" )
+                    , ( "width", "100%" )
+                    ]
+                ]
+                [ checkbox [ name "toggle", checked (model.direction == "column") ] ToggleColumn "Toggle Column Second in HTML - Order 3" ]
+            ]
+        , flex [ Layout.size "90", order 2 ]
+            [ div
+                [ style
+                    [ ( "backgroundColor", "green" )
+                    , ( "color", "white" )
+                    , ( "height", "100%" )
+                    , ( "width", "100%" )
+                    ]
+                ]
+                [ text "Third in Html - Order 2" ]
+            ]
+        ]
