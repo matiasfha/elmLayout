@@ -13,7 +13,7 @@ main =
 
 
 type alias Model =
-    { direction : String
+    { direction : Direction
     , parallel : String
     , perpendicular : String
     }
@@ -21,7 +21,7 @@ type alias Model =
 
 state : Model
 state =
-    Model "column" "start" "center"
+    Model Column "start" "center"
 
 
 type Msg
@@ -33,10 +33,10 @@ update : Msg -> Model -> Model
 update msg model =
     case msg of
         ToggleRow ->
-            { model | direction = "row" }
+            { model | direction = Row }
 
         ToggleColumn ->
-            { model | direction = "column" }
+            { model | direction = Column }
 
 
 checkbox : List (Attribute msg) -> msg -> String -> Html msg
@@ -49,9 +49,19 @@ checkbox attributes msg name =
         ]
 
 
+getElement : Model -> Html Msg
+getElement model =
+    case model.direction of
+        Row ->
+            row
+
+        Column ->
+            column
+
+
 view : Model -> Html Msg
 view model =
-    container [ Layout.size "80", direction ( model.direction, False ), alignPara "center", alignPerpen "center" ]
+    (getElement model) [ Layout.size "80", alignPara "center", alignPerpen "center" ]
         [ flex [ Layout.size "70", order 1 ]
             [ div
                 [ style

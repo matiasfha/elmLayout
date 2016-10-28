@@ -1,12 +1,7 @@
 module Layout.Attributes exposing (..)
 
 import Layout.Helpers exposing (..)
-
-
-type alias LAttr =
-    { value : String
-    , active : Bool
-    }
+import Layout.Types exposing (..)
 
 
 alignPerpen : String -> LAttr
@@ -32,9 +27,9 @@ size str =
     { value = parseSize str, active = True }
 
 
-direction : ( String, Bool ) -> LAttr
-direction ( str, reverse ) =
-    { value = parseDirection str reverse, active = True }
+direction : ( Direction, Bool ) -> LAttr
+direction ( direction, reverse ) =
+    { value = parseDirection direction reverse, active = True }
 
 
 fill : Bool -> LAttr

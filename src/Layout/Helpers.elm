@@ -4,31 +4,11 @@ import String exposing (concat)
 import Html exposing (Attribute)
 import Array exposing (fromList)
 import Layout.Grid exposing (CssClasses(..), styleNamespace)
+import Layout.Types exposing (..)
 
 
 { id, class, classList, name } =
     styleNamespace
-
-
-
--- TODO this is repeated here and in Attributes.elm
-
-
-type alias LAttr =
-    { value : String
-    , active : Bool
-    }
-
-
-type Alignment
-    = Start
-    | Center
-    | End'
-    | SpaceAround
-    | SpaceBetween
-    | Stretch
-
-
 getClassList : List LAttr -> List (Attribute a)
 getClassList params =
     let
@@ -126,17 +106,20 @@ parseAlign align =
         }
 
 
-parseDirection : String -> Bool -> String
+parseDirection : Direction -> Bool -> String
 parseDirection direction reverse =
-    if direction == "row" then
-        if reverse == True then
-            toString LayoutRowReverse
-        else
-            toString LayoutRow
-    else if reverse == True then
-        toString LayoutColumnReverse
-    else
-        toString LayoutColumn
+    case direction of
+        Row ->
+            if reverse == True then
+                toString LayoutRowReverse
+            else
+                toString LayoutRow
+
+        Column ->
+            if reverse == True then
+                toString LayoutColumnReverse
+            else
+                toString LayoutColumn
 
 
 parseSize : String -> String

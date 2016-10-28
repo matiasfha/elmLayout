@@ -1,6 +1,8 @@
 module Layout
     exposing
         ( layout
+        , row
+        , column
         , flex
         , container
         , alignPerpen
@@ -10,54 +12,59 @@ module Layout
         , fill
         , wrap
         , order
+        , Direction
+        , Alignment
         )
 
 import Html exposing (..)
-import Layout.Grid exposing (styleNamespace)
-import Layout.Helpers exposing (..)
+import Layout.Types exposing (..)
+import Layout.Layout as Layout exposing (layout)
+import Layout.Column as Column exposing (column)
+import Layout.Row as Row exposing (row)
+import Layout.Flex as Flex exposing (flex)
+import Layout.Container as Container exposing (container)
 import Layout.Attributes as Attr exposing (..)
+import Layout.Types as Types exposing (..)
 
 
-{ id, class, classList, name } =
-    styleNamespace
+{--Types --}
+
+
+type alias Direction =
+    Types.Direction
+
+
+type alias Alignment =
+    Types.Alignment
+
+
+
+{--Elements --}
+
+
 layout : List LAttr -> List (Html msg) -> Html msg
-layout params children =
-    case List.isEmpty (Debug.log "params" params) of
-        True ->
-            node "layout"
-                (getClassList
-                    [ direction ( "row", False )
-                    , alignPara "start"
-                    , alignPerpen "stretch"
-                    ]
-                )
-                children
+layout =
+    Layout.layout
 
-        False ->
-            -- default parameters
-            node "layout" (getClassList params) children
+
+column : List LAttr -> List (Html msg) -> Html msg
+column =
+    Column.column
+
+
+row : List LAttr -> List (Html msg) -> Html msg
+row =
+    Row.row
 
 
 flex : List LAttr -> List (Html msg) -> Html msg
-flex params children =
-    node "flex"
-        (getClassList params)
-        children
-
-
-
-{-
-   * Utility for centering Layouts inside other Layouts, has the same parameters
-   * as the `layout` element, but it always fills the parent component.
-   * (from http://stackoverflow.com/questions/15381172/css-flexbox-child-height-100)
--}
+flex =
+    Flex.flex
 
 
 container : List LAttr -> List (Html msg) -> Html msg
-container params children =
-    layout [ fill True, wrap False ]
-        [ (layout params children)
-        ]
+container =
+    Container.container
 
 
 
@@ -65,33 +72,33 @@ container params children =
 
 
 alignPerpen : String -> LAttr
-alignPerpen str =
-    Attr.alignPerpen str
+alignPerpen =
+    Attr.alignPerpen
 
 
 alignPara : String -> LAttr
-alignPara str =
-    Attr.alignPara str
+alignPara =
+    Attr.alignPara
 
 
 size : String -> LAttr
-size str =
-    Attr.size str
+size =
+    Attr.size
 
 
-direction : ( String, Bool ) -> LAttr
-direction ( str, reverse ) =
-    Attr.direction ( str, reverse )
+direction : ( Types.Direction, Bool ) -> LAttr
+direction =
+    Attr.direction
 
 
 fill : Bool -> LAttr
-fill bool =
-    Attr.fill bool
+fill =
+    Attr.fill
 
 
 wrap : Bool -> LAttr
-wrap bool =
-    Attr.wrap bool
+wrap =
+    Attr.wrap
 
 
 order : Int -> LAttr
