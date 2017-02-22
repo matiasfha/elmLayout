@@ -16,8 +16,8 @@ layout params children =
             div
                 (getClassList
                     [ direction ( Row, False )
-                    , alignPara "start"
-                    , alignPerpen "stretch"
+                    , alignPara Start
+                    , alignPerpen Stretch
                     ]
                 )
                 children

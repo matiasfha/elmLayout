@@ -4,22 +4,14 @@ import Layout.Helpers exposing (..)
 import Layout.Types exposing (..)
 
 
-alignPerpen : String -> LAttr
+alignPerpen : Alignment -> LAttr
 alignPerpen str =
-    let
-        aligns =
-            parseAlign ("-- " ++ str)
-    in
-        { value = aligns.perpendicular, active = True }
+    { value = toString str, active = True }
 
 
-alignPara : String -> LAttr
+alignPara : Alignment -> LAttr
 alignPara str =
-    let
-        aligns =
-            parseAlign (str ++ " --")
-    in
-        { value = aligns.parallel, active = True }
+    { value = toString str, active = True }
 
 
 size : String -> LAttr

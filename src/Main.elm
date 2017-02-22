@@ -14,14 +14,14 @@ main =
 
 type alias Model =
     { direction : Direction
-    , parallel : String
-    , perpendicular : String
+    , parallel : Alignment
+    , perpendicular : Alignment
     }
 
 
 state : Model
 state =
-    Model Column "start" "center"
+    Model Column Start Center
 
 
 type Msg
@@ -49,7 +49,7 @@ checkbox attributes msg name =
         ]
 
 
-getElement : Model -> Html Msg
+getElement : Model -> List LAttr -> List (Html msg) -> Html msg
 getElement model =
     case model.direction of
         Row ->
@@ -61,7 +61,7 @@ getElement model =
 
 view : Model -> Html Msg
 view model =
-    (getElement model) [ Layout.size "80", alignPara "center", alignPerpen "center" ]
+    (getElement model) [ Layout.size "80", alignPara Center, alignPerpen Center ]
         [ flex [ Layout.size "70", order 1 ]
             [ div
                 [ style
@@ -71,7 +71,7 @@ view model =
                     , ( "width", "100%" )
                     ]
                 ]
-                [ checkbox [ name "toggle", checked (model.direction == "row") ] ToggleRow "Toggle Row First in HTML - Order 1" ]
+                [ checkbox [ name "toggle", checked (model.direction == Row) ] ToggleRow "Toggle Row First in HTML - Order 1" ]
             ]
         , flex [ Layout.size "40", order 3 ]
             [ div
@@ -82,7 +82,7 @@ view model =
                     , ( "width", "100%" )
                     ]
                 ]
-                [ checkbox [ name "toggle", checked (model.direction == "column") ] ToggleColumn "Toggle Column Second in HTML - Order 3" ]
+                [ checkbox [ name "toggle", checked (model.direction == Column) ] ToggleColumn "Toggle Column Second in HTML - Order 3" ]
             ]
         , flex [ Layout.size "90", order 2 ]
             [ div

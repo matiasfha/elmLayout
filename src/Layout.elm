@@ -14,6 +14,7 @@ module Layout
         , order
         , Direction
         , Alignment
+        , LAttr
         )
 
 import Html exposing (..)
@@ -24,14 +25,18 @@ import Layout.Row as Row exposing (row)
 import Layout.Flex as Flex exposing (flex)
 import Layout.Container as Container exposing (container)
 import Layout.Attributes as Attr exposing (..)
-import Layout.Types as Types exposing (..)
+import Layout.Types as Types
 
 
 {--Types --}
 
 
 type alias Direction =
-    Types.Direction
+    Layout.Types.Direction
+
+
+type alias LAttr =
+    Types.LAttr
 
 
 type alias Alignment =
@@ -39,6 +44,12 @@ type alias Alignment =
 
 
 
+-- = Start
+-- | Center
+-- | End'
+-- | SpaceAround
+-- | SpaceBetween
+-- | Stretch
 {--Elements --}
 
 
@@ -71,12 +82,12 @@ container =
 {- Attributes -}
 
 
-alignPerpen : String -> LAttr
+alignPerpen : Types.Alignment -> LAttr
 alignPerpen =
     Attr.alignPerpen
 
 
-alignPara : String -> LAttr
+alignPara : Types.Alignment -> LAttr
 alignPara =
     Attr.alignPara
 
